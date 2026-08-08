@@ -422,6 +422,24 @@
         <div class="status-msg" id="folderScanStatus"></div>
         <p class="file-note" id="folderUnsupportedNote" style="display:none;">Эта функция браузера (File System Access API) не поддерживается в текущем браузере — работает в Chrome и Edge на компьютере, но не в Safari, Firefox или на телефоне.</p>
       </div>
+
+      <div class="card c-gold" id="sheetSyncCard">
+        <h2>Синхронизация с Google Таблицей</h2>
+        <p class="sub">Ссылка и слово хранятся только в этом браузере — не публикуются на GitHub</p>
+        <div id="sheetSyncSetup">
+          <label>Ссылка веб-приложения (Apps Script)</label>
+          <input type="text" id="sheetSyncUrl" placeholder="https://script.google.com/macros/s/.../exec">
+          <label>Секретное слово</label>
+          <input type="text" id="sheetSyncSecret" placeholder="Твоё секретное слово из скрипта">
+          <button type="button" class="btn-primary" id="sheetSyncConnectBtn" style="background:linear-gradient(90deg,var(--gold),var(--green));">Подключить таблицу</button>
+        </div>
+        <div id="sheetSyncConnected" style="display:none;">
+          <p class="sub" id="sheetSyncInfo">Подключено.</p>
+          <button type="button" class="btn-primary" id="sheetSyncNowBtn" style="background:linear-gradient(90deg,var(--slate),var(--green));">Синхронизировать сейчас</button>
+          <button type="button" class="clear-all-chip" id="sheetSyncDisconnectBtn" style="margin-top:10px;">Отключить</button>
+        </div>
+        <div class="status-msg" id="sheetSyncStatus"></div>
+      </div>
     </section>
 
     <section class="panel">
@@ -890,6 +908,7 @@ async function saveData(){
   catch(e){ console.error('Не удалось сохранить данные', e); }
   await writeDatabaseFile();
   await writeBackToSourceFile();
+  await pushToSheet();
 }
 function escapeHtml(str){ const d=document.createElement('div'); d.textContent = str ?? ''; return d.innerHTML; }
 function genId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
@@ -2548,11 +2567,160 @@ document.getElementById('bulkExportBtn').addEventListener('click', ()=>{
   XLSX.writeFile(wb, 'выбранные_сотрудники.xlsx');
 });
 
+// ---------- Синхронизация с Google Таблицей (через Apps Script Web App) ----------
+let sheetSyncUrl = '';
+let sheetSyncSecret = '';
+let sheetSyncTimer = null;
+let sheetSyncBusy = false;
+
+function showSheetSyncStatus(msg, isError){
+  const el = document.getElementById('sheetSyncStatus');
+  el.textContent = msg;
+  el.className = 'status-msg ' + (isError ? 'err' : 'ok');
+}
+
+function updateSheetSyncUI(){
+  const setupEl = document.getElementById('sheetSyncSetup');
+  const connectedEl = document.getElementById('sheetSyncConnected');
+  if(sheetSyncUrl){
+    setupEl.style.display = 'none';
+    connectedEl.style.display = 'block';
+    document.getElementById('sheetSyncInfo').textContent = `Подключено. Автопроверка таблицы каждые 45 сек.`;
+  } else {
+    setupEl.style.display = 'block';
+    connectedEl.style.display = 'none';
+  }
+}
+
+async function loadSheetSyncConfig(){
+  try{
+    sheetSyncUrl = (await kvGet('sheetSyncUrl')) || '';
+    sheetSyncSecret = (await kvGet('sheetSyncSecret')) || '';
+  }catch(e){ sheetSyncUrl=''; sheetSyncSecret=''; }
+  updateSheetSyncUI();
+  if(sheetSyncUrl){
+    startSheetSyncPolling();
+    pullFromSheet();
+  }
+}
+
+function startSheetSyncPolling(){
+  if(sheetSyncTimer) clearInterval(sheetSyncTimer);
+  sheetSyncTimer = setInterval(pullFromSheet, 45000);
+}
+
+function employeeToSheetRow(e){
+  return {
+    'ID': e.id,
+    'Фамилия': e.last, 'Имя': e.first, 'Отчество': e.middle,
+    'Возраст': e.age ?? '', 'Пол': e.gender, 'Отдел': e.dept,
+    'Категория': e.category,
+    'Компания': COMPANY_BY_ID[e.company] ? COMPANY_BY_ID[e.company].name : e.company,
+    'Статус': e.status, 'Причина увольнения': e.reason,
+    'Дата увольнения': e.termDate, 'Дата приёма': e.hireDate
+  };
+}
+
+function sheetRowToEmployee(row, oldById){
+  const id = row['ID'] ? String(row['ID']) : genId();
+  const old = oldById[id];
+  const ageRaw = row['Возраст'];
+  const age = (ageRaw!==''&&ageRaw!==undefined&&ageRaw!==null&&!isNaN(Number(ageRaw))) ? Number(ageRaw) : null;
+  return {
+    id,
+    last: String(row['Фамилия']||''), first: String(row['Имя']||''), middle: String(row['Отчество']||''),
+    age, gender: normalizeGender(row['Пол']), dept: String(row['Отдел']||''),
+    category: normalizeCategory(row['Категория']),
+    company: findCompanyId(row['Компания']),
+    status: normalizeStatus(row['Статус']),
+    reason: String(row['Причина увольнения']||''),
+    termDate: String(row['Дата увольнения']||''),
+    hireDate: String(row['Дата приёма']||''),
+    history: old ? (old.history||[]) : []
+  };
+}
+
+async function pullFromSheet(){
+  if(!sheetSyncUrl || sheetSyncBusy) return;
+  sheetSyncBusy = true;
+  try{
+    const res = await fetch(`${sheetSyncUrl}?secret=${encodeURIComponent(sheetSyncSecret)}`);
+    const data = await res.json();
+    if(data.error){
+      showSheetSyncStatus('Ошибка доступа к таблице: проверь ссылку и секретное слово.', true);
+      return;
+    }
+    if(Array.isArray(data.employees)){
+      const oldById = {};
+      employees.forEach(e=>{ oldById[e.id] = e; });
+      employees = data.employees.map(row=> sheetRowToEmployee(row, oldById));
+      renderAll();
+      try{ await kvSet(STORAGE_KEY, JSON.stringify(employees)); }catch(e){}
+      await writeDatabaseFile();
+      await writeBackToSourceFile();
+      showSheetSyncStatus(`Обновлено из таблицы: ${employees.length} сотрудников.`, false);
+    }
+  }catch(err){
+    showSheetSyncStatus('Не удалось связаться с таблицей: ' + err.message, true);
+  }finally{
+    sheetSyncBusy = false;
+  }
+}
+
+async function pushToSheet(){
+  if(!sheetSyncUrl) return;
+  try{
+    await fetch(sheetSyncUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ secret: sheetSyncSecret, employees: employees.map(employeeToSheetRow) })
+    });
+  }catch(err){
+    console.error('Не удалось отправить данные в таблицу', err);
+  }
+}
+
+document.getElementById('sheetSyncConnectBtn').addEventListener('click', async ()=>{
+  const url = document.getElementById('sheetSyncUrl').value.trim();
+  const secret = document.getElementById('sheetSyncSecret').value.trim();
+  if(!url || !secret){
+    showSheetSyncStatus('Заполни ссылку и секретное слово.', true);
+    return;
+  }
+  sheetSyncUrl = url;
+  sheetSyncSecret = secret;
+  try{ await kvSet('sheetSyncUrl', url); await kvSet('sheetSyncSecret', secret); }catch(e){}
+  updateSheetSyncUI();
+  showSheetSyncStatus('Подключаю и проверяю связь...', false);
+  await pullFromSheet();
+  if(employees.length === 0){
+    await pushToSheet();
+  }
+  startSheetSyncPolling();
+});
+
+document.getElementById('sheetSyncNowBtn').addEventListener('click', async ()=>{
+  showSheetSyncStatus('Проверяю таблицу...', false);
+  await pullFromSheet();
+  await pushToSheet();
+});
+
+document.getElementById('sheetSyncDisconnectBtn').addEventListener('click', async ()=>{
+  if(!confirm('Отключить синхронизацию с Google Таблицей? Сама таблица не пострадает.')) return;
+  sheetSyncUrl = ''; sheetSyncSecret = '';
+  if(sheetSyncTimer) clearInterval(sheetSyncTimer);
+  try{ await kvSet('sheetSyncUrl',''); await kvSet('sheetSyncSecret',''); }catch(e){}
+  updateSheetSyncUI();
+  document.getElementById('sheetSyncStatus').textContent = '';
+  document.getElementById('sheetSyncStatus').className = 'status-msg';
+});
+
 (async function init(){
   await loadData();
   renderAll();
   await initFolderSync();
   await initSourceFileSync();
+  await loadSheetSyncConfig();
 })();
 </script>
 </body>
