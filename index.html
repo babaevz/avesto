@@ -819,6 +819,12 @@ const PALETTE = ['#0F7A4B','#C9A227','#3E5C55','#6B7A3D','#8C5A2B','#33413A','#1
 const STORAGE_KEY = 'employees-data-v2';
 
 const CATEGORIES = ['Стажёр','Специалист','Ведущий специалист','Руководитель отдела','Директор'];
+const DEFAULT_DEPARTMENTS = [
+  'Бухгалтерия','Отдел кадров','Логистика','Машиностроение',
+  'Агропромышленный комплекс','Финансовый отдел','IT-отдел','Маркетинг',
+  'Юридический отдел','Производство','Отдел продаж','Служба безопасности',
+  'Технический отдел','Отдел закупок','Отдел качества','PR и коммуникации'
+];
 const CATEGORY_COLOR = {
   'Стажёр':'#8FA82E','Специалист':'#0F7A4B','Ведущий специалист':'#1E9E63',
   'Руководитель отдела':'#C9A227','Директор':'#33413A'
@@ -1205,7 +1211,7 @@ function renderCompanies(){
 }
 
 function renderSelectOptions(){
-  const depts = [...new Set(employees.map(e=>e.dept))];
+  const depts = [...new Set([...DEFAULT_DEPARTMENTS, ...employees.map(e=>e.dept)])];
   document.getElementById('deptList').innerHTML = depts.map(d=>`<option value="${escapeHtml(d)}">`).join('');
   document.getElementById('filterDept').innerHTML = '<option value="">Все отделы</option>' + depts.map(d=>`<option value="${escapeHtml(d)}" ${filters.dept===d?'selected':''}>${escapeHtml(d)}</option>`).join('');
   document.getElementById('filterCategory').innerHTML = '<option value="">Все категории</option>' + CATEGORIES.map(c=>`<option value="${escapeHtml(c)}" ${filters.category===c?'selected':''}>${escapeHtml(c)}</option>`).join('');
