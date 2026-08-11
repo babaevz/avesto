@@ -425,10 +425,8 @@
 
       <div class="card c-gold" id="sheetSyncCard">
         <h2>Синхронизация с Google Таблицей</h2>
-        <p class="sub">Ссылка и слово хранятся только в этом браузере — не публикуются на GitHub</p>
+        <p class="sub">Таблица холдинга уже подключена к сайту — введи только секретное слово (оно хранится лишь в этом браузере)</p>
         <div id="sheetSyncSetup">
-          <label>Ссылка веб-приложения (Apps Script)</label>
-          <input type="text" id="sheetSyncUrl" placeholder="https://script.google.com/macros/s/.../exec">
           <label>Секретное слово</label>
           <input type="text" id="sheetSyncSecret" placeholder="Твоё секретное слово из скрипта">
           <button type="button" class="btn-primary" id="sheetSyncConnectBtn" style="background:linear-gradient(90deg,var(--gold),var(--green));">Подключить таблицу</button>
@@ -2574,7 +2572,9 @@ document.getElementById('bulkExportBtn').addEventListener('click', ()=>{
 });
 
 // ---------- Синхронизация с Google Таблицей (через Apps Script Web App) ----------
-let sheetSyncUrl = '';
+// Ссылка не секретна сама по себе (без секретного слова она бесполезна), поэтому её можно хранить прямо в коде.
+const DEFAULT_SHEET_SYNC_URL = 'https://script.google.com/macros/s/AKfycbwo8_uAZmClcotb46vxprp4gCh4JmpYTSN0SO5lko8HF-EDKgNUAUZ9slfhTSXptkOpzA/exec';
+let sheetSyncUrl = DEFAULT_SHEET_SYNC_URL;
 let sheetSyncSecret = '';
 let sheetSyncTimer = null;
 let sheetSyncBusy = false;
@@ -2588,7 +2588,7 @@ function showSheetSyncStatus(msg, isError){
 function updateSheetSyncUI(){
   const setupEl = document.getElementById('sheetSyncSetup');
   const connectedEl = document.getElementById('sheetSyncConnected');
-  if(sheetSyncUrl){
+  if(sheetSyncSecret){
     setupEl.style.display = 'none';
     connectedEl.style.display = 'block';
     document.getElementById('sheetSyncInfo').textContent = `Подключено. Автопроверка таблицы каждые 45 сек.`;
@@ -2599,12 +2599,12 @@ function updateSheetSyncUI(){
 }
 
 async function loadSheetSyncConfig(){
+  sheetSyncUrl = DEFAULT_SHEET_SYNC_URL;
   try{
-    sheetSyncUrl = (await kvGet('sheetSyncUrl')) || '';
     sheetSyncSecret = (await kvGet('sheetSyncSecret')) || '';
-  }catch(e){ sheetSyncUrl=''; sheetSyncSecret=''; }
+  }catch(e){ sheetSyncSecret=''; }
   updateSheetSyncUI();
-  if(sheetSyncUrl){
+  if(sheetSyncSecret){
     startSheetSyncPolling();
     pullFromSheet();
   }
@@ -2720,15 +2720,14 @@ async function pushToSheet(){
 }
 
 document.getElementById('sheetSyncConnectBtn').addEventListener('click', async ()=>{
-  const url = document.getElementById('sheetSyncUrl').value.trim();
   const secret = document.getElementById('sheetSyncSecret').value.trim();
-  if(!url || !secret){
-    showSheetSyncStatus('Заполни ссылку и секретное слово.', true);
+  if(!secret){
+    showSheetSyncStatus('Впиши секретное слово.', true);
     return;
   }
-  sheetSyncUrl = url;
+  sheetSyncUrl = DEFAULT_SHEET_SYNC_URL;
   sheetSyncSecret = secret;
-  try{ await kvSet('sheetSyncUrl', url); await kvSet('sheetSyncSecret', secret); }catch(e){}
+  try{ await kvSet('sheetSyncSecret', secret); }catch(e){}
   updateSheetSyncUI();
   showSheetSyncStatus('Подключаю и проверяю связь...', false);
   await pullFromSheet();
@@ -2746,9 +2745,10 @@ document.getElementById('sheetSyncNowBtn').addEventListener('click', async ()=>{
 
 document.getElementById('sheetSyncDisconnectBtn').addEventListener('click', async ()=>{
   if(!confirm('Отключить синхронизацию с Google Таблицей? Сама таблица не пострадает.')) return;
-  sheetSyncUrl = ''; sheetSyncSecret = '';
+  sheetSyncUrl = DEFAULT_SHEET_SYNC_URL; sheetSyncSecret = '';
   if(sheetSyncTimer) clearInterval(sheetSyncTimer);
-  try{ await kvSet('sheetSyncUrl',''); await kvSet('sheetSyncSecret',''); }catch(e){}
+  try{ await kvSet('sheetSyncSecret',''); }catch(e){}
+  document.getElementById('sheetSyncSecret').value = '';
   updateSheetSyncUI();
   document.getElementById('sheetSyncStatus').textContent = '';
   document.getElementById('sheetSyncStatus').className = 'status-msg';
