@@ -26,20 +26,24 @@
     --shadow: 0 1px 0 rgba(27,42,34,0.04), 0 10px 24px -16px rgba(11,94,58,0.28);
   }
   *{box-sizing:border-box;}
-  html{overflow-x:hidden;}
+  html{
+    background: var(--paper);
+    min-height:100%;
+  }
   body{
     margin:0;
-    overflow-x:hidden;
     min-height:100vh;
     background:
       linear-gradient(180deg, var(--green-deep) 0px, var(--green-deep) 6px, transparent 6px),
       radial-gradient(900px 500px at 100% 0%, rgba(15,122,75,0.06), transparent 55%),
       var(--paper);
-    background-attachment:local;
     color:var(--ink);
     font-family:'Inter',sans-serif;
     -webkit-font-smoothing:antialiased;
   }
+  /* Не даём отдельным элементам "распирать" grid/flex-контейнеры своим содержимым */
+  .grid, .charts-row, .metrics-row, .companies-grid { min-width:0; }
+  .grid > *, .charts-row > *, .metrics-row > *, .companies-grid > * { min-width:0; }
   .page{max-width:1240px;margin:0 auto;padding:40px 24px 80px;}
   header.top{
     display:flex;justify-content:space-between;align-items:flex-end;
