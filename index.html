@@ -425,10 +425,10 @@
 
       <div class="card c-gold" id="sheetSyncCard">
         <h2>Синхронизация с Google Таблицей</h2>
-        <p class="sub">Таблица холдинга уже подключена к сайту — введи только секретное слово (оно хранится лишь в этом браузере)</p>
+        <p class="sub">Единая база сотрудников холдинга. Введите пароль, чтобы сайт синхронизировался с общими данными.</p>
         <div id="sheetSyncSetup">
-          <label>Секретное слово</label>
-          <input type="text" id="sheetSyncSecret" placeholder="Твоё секретное слово из скрипта">
+          <label>Пароль доступа</label>
+          <input type="password" id="sheetSyncSecret" placeholder="">
           <button type="button" class="btn-primary" id="sheetSyncConnectBtn" style="background:linear-gradient(90deg,var(--gold),var(--green));">Подключить таблицу</button>
         </div>
         <div id="sheetSyncConnected" style="display:none;">
@@ -2055,7 +2055,7 @@ function buildTrendSvg(points, risingColor, fallingColor, meta){
   `;
   }).join('');
   const baseline = padT+innerH;
-  return `<div style="overflow-x:auto;">
+  return `<div style="overflow-x:auto;width:100%;max-width:100%;">
     <svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="display:block;">
       <line x1="${padL}" y1="${baseline}" x2="${w-padR}" y2="${baseline}" stroke="var(--line)" stroke-width="1"/>
       ${segments}
@@ -2685,7 +2685,7 @@ async function pullFromSheet(){
   try{
     const data = await jsonpRequest(`${sheetSyncUrl}?secret=${encodeURIComponent(sheetSyncSecret)}`);
     if(data.error){
-      showSheetSyncStatus('Ошибка доступа к таблице: проверь ссылку и секретное слово.', true);
+      showSheetSyncStatus('Неверный пароль — доступ к базе запрещён.', true);
       return;
     }
     if(Array.isArray(data.employees)){
@@ -2722,7 +2722,7 @@ async function pushToSheet(){
 document.getElementById('sheetSyncConnectBtn').addEventListener('click', async ()=>{
   const secret = document.getElementById('sheetSyncSecret').value.trim();
   if(!secret){
-    showSheetSyncStatus('Впиши секретное слово.', true);
+    showSheetSyncStatus('Введите пароль.', true);
     return;
   }
   sheetSyncUrl = DEFAULT_SHEET_SYNC_URL;
