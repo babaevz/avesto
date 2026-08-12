@@ -1416,7 +1416,11 @@ document.getElementById('addForm').addEventListener('submit', async (ev)=>{
 
 document.getElementById('clearAllBtn').addEventListener('click', async ()=>{
   if(employees.length===0) return;
-  if(!confirm('Удалить всех сотрудников из реестра? Это действие необратимо.')) return;
+  let msg = 'Удалить всех сотрудников из реестра? Это действие необратимо.';
+  if(sheetSyncSecret){
+    msg += '\n\nВНИМАНИЕ: подключена Google Таблица — она тоже будет очищена, так как сайт всегда сохраняет туда точную копию реестра.';
+  }
+  if(!confirm(msg)) return;
   employees = [];
   renderAll();
   await saveData();
@@ -1426,7 +1430,8 @@ document.getElementById('fullResetBtn').addEventListener('click', async ()=>{
   const ok = confirm(
     'Полный сброс сайта:\n' +
     '— удалятся все сотрудники из реестра;\n' +
-    '— отключится подключённая папка и файл автосохранения (сами Excel-файлы на диске НЕ удаляются, только связь с сайтом).\n\n' +
+    '— отключится подключённая папка и файл автосохранения (сами Excel-файлы на диске НЕ удаляются, только связь с сайтом);\n' +
+    '— отключится синхронизация с Google Таблицей (сама таблица НЕ очищается — просто сайт перестанет с ней связываться).\n\n' +
     'Продолжить?'
   );
   if(!ok) return;
@@ -1435,20 +1440,27 @@ document.getElementById('fullResetBtn').addEventListener('click', async ()=>{
   folderHandle = null;
   sourceFileHandle = null;
   folderManifest = {};
+  sheetSyncSecret = '';
+  if(sheetSyncTimer) clearInterval(sheetSyncTimer);
 
   try{ await idbDeleteHandle('folder'); }catch(e){}
   try{ await idbDeleteHandle('sourceFile'); }catch(e){}
   try{ await kvSet(STORAGE_KEY, JSON.stringify([])); }catch(e){}
   try{ await kvSet('folder-sync-manifest', JSON.stringify({})); }catch(e){}
+  try{ await kvSet('sheetSyncSecret', ''); }catch(e){}
 
   renderAll();
   updateFolderUI();
+  updateSheetSyncUI();
   document.getElementById('folderScanStatus').textContent = '';
   document.getElementById('folderScanStatus').className = 'status-msg';
   document.getElementById('sourceFileStatus').textContent = '';
   document.getElementById('sourceFileStatus').className = '';
+  document.getElementById('sheetSyncStatus').textContent = '';
+  document.getElementById('sheetSyncStatus').className = 'status-msg';
+  document.getElementById('sheetSyncSecret').value = '';
 
-  alert('Готово. Сайт сброшен: реестр пуст, папка и файл автосохранения отключены.');
+  alert('Готово. Сайт сброшен: реестр пуст, папка, файл автосохранения и синхронизация с Google Таблицей отключены (сама таблица не тронута).');
 });
 
 document.getElementById('searchInput').addEventListener('input', (ev)=>{
@@ -2577,7 +2589,7 @@ document.getElementById('bulkExportBtn').addEventListener('click', ()=>{
 
 // ---------- Синхронизация с Google Таблицей (через Apps Script Web App) ----------
 // Ссылка не секретна сама по себе (без секретного слова она бесполезна), поэтому её можно хранить прямо в коде.
-const DEFAULT_SHEET_SYNC_URL = 'https://script.google.com/macros/s/AKfycbwqSyWHxfA7Cm2hY07mldOQfP_KrsvAM1aGMlJy141bZGmALmbjYUPSDGpZAVtYbAn1lA/exec';
+const DEFAULT_SHEET_SYNC_URL = 'https://script.google.com/macros/s/AKfycbwo8_uAZmClcotb46vxprp4gCh4JmpYTSN0SO5lko8HF-EDKgNUAUZ9slfhTSXptkOpzA/exec';
 let sheetSyncUrl = DEFAULT_SHEET_SYNC_URL;
 let sheetSyncSecret = '';
 let sheetSyncTimer = null;
