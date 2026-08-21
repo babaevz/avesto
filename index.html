@@ -315,6 +315,203 @@
   }
   .modal-close:hover{color:var(--rust);}
   .modal-box .table-scroll{padding:16px 22px 20px;max-height:60vh;}
+
+  /* ---------- Анимации ---------- */
+  @keyframes fadeInUp{
+    from{opacity:0;transform:translateY(14px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  @keyframes modalPop{
+    from{opacity:0;transform:translateY(10px) scale(.97);}
+    to{opacity:1;transform:translateY(0) scale(1);}
+  }
+  @keyframes overlayFade{
+    from{opacity:0;} to{opacity:1;}
+  }
+  @keyframes donutPop{
+    from{opacity:0;transform:scale(.82) rotate(-8deg);}
+    to{opacity:1;transform:scale(1) rotate(0deg);}
+  }
+  @keyframes softPulse{
+    0%{box-shadow:0 0 0 0 rgba(15,122,75,0.35);}
+    70%{box-shadow:0 0 0 10px rgba(15,122,75,0);}
+    100%{box-shadow:0 0 0 0 rgba(15,122,75,0);}
+  }
+  @keyframes rowSlideIn{
+    from{opacity:0;transform:translateX(-6px);}
+    to{opacity:1;transform:translateX(0);}
+  }
+
+  .card, .metric-card, .company-card{
+    animation:fadeInUp .5s cubic-bezier(.22,1,.36,1) both;
+  }
+  .card{transition:box-shadow .2s ease, transform .2s ease;}
+  .card:hover{box-shadow:0 14px 30px -16px rgba(11,94,58,0.28);}
+  .metric-card{transition:box-shadow .2s ease, transform .2s ease;}
+  .metric-card:hover{transform:translateY(-3px);box-shadow:0 14px 26px -14px rgba(11,94,58,0.3);}
+  .metric-num{transition:color .2s ease;}
+
+  button, .btn-primary{transition:transform .12s ease, box-shadow .15s ease, background .15s ease;}
+  button:hover{transform:translateY(-1px);}
+  button:active{transform:translateY(1px) scale(.98);}
+  .btn-primary:hover{transform:translateY(-2px);}
+
+  .donut{animation:donutPop .5s cubic-bezier(.22,1,.36,1) both;}
+
+  .bar-fill{transition:width .7s cubic-bezier(.22,1,.36,1), background .2s ease;}
+  .bar-row{transition:background .12s ease, transform .12s ease;}
+  .bar-row:hover{transform:translateX(2px);}
+
+  .legend-row{animation:rowSlideIn .35s ease both;}
+  .warning-row{animation:fadeInUp .4s ease both;}
+  .warning-row:hover{transform:translateX(2px);}
+
+  .company-card{transition:box-shadow .2s ease, border-color .2s ease, transform .2s ease;}
+  .company-card:hover{transform:translateY(-2px);}
+
+  .modal-overlay{animation:overlayFade .2s ease both;}
+  .modal-box{animation:modalPop .28s cubic-bezier(.22,1,.36,1) both;}
+
+  .dropzone{transition:border-color .2s ease, background .2s ease, transform .2s ease;}
+  .dropzone:hover{transform:translateY(-1px);}
+
+  .brand-logo{transition:transform .3s ease;}
+  .brand-row:hover .brand-logo{transform:rotate(-4deg) scale(1.04);}
+
+  #sessionBadge, .status-msg.ok, .status-msg.err{animation:fadeInUp .3s ease both;}
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration:0.001ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:0.001ms !important;
+      scroll-behavior:auto !important;
+    }
+  }
+
+  .metrics-row .metric-card{animation-delay:0s;}
+  .metrics-row .metric-card:nth-child(2){animation-delay:.05s;}
+  .metrics-row .metric-card:nth-child(3){animation-delay:.1s;}
+  .metrics-row .metric-card:nth-child(4){animation-delay:.15s;}
+  .panel .card:nth-of-type(2){animation-delay:.05s;}
+  .panel .card:nth-of-type(3){animation-delay:.1s;}
+  .panel .card:nth-of-type(4){animation-delay:.15s;}
+  .companies-grid .company-card:nth-child(1){animation-delay:.01s;}
+  .companies-grid .company-card:nth-child(2){animation-delay:.03s;}
+  .companies-grid .company-card:nth-child(3){animation-delay:.05s;}
+  .companies-grid .company-card:nth-child(4){animation-delay:.07s;}
+  .companies-grid .company-card:nth-child(5){animation-delay:.09s;}
+  .companies-grid .company-card:nth-child(6){animation-delay:.11s;}
+  .companies-grid .company-card:nth-child(n+7){animation-delay:.13s;}
+
+  /* Ограниченный доступ (не HQ): скрываем управление реестром */
+  body.scoped-view #addEmployeeCard,
+  body.scoped-view #excelUploadCard,
+  body.scoped-view #folderSyncCard,
+  body.scoped-view #sheetSyncCard,
+  body.scoped-view #bulkBar,
+  body.scoped-view .row-checkbox,
+  body.scoped-view #selectAllCheckbox,
+  body.scoped-view .del-btn,
+  body.scoped-view #profileForm button[type="submit"],
+  body.scoped-view #profileDeleteBtn,
+  body.scoped-view #pTransferBtn,
+  body.scoped-view #pFireBtn,
+  body.scoped-view #pRehireBtn,
+  body.scoped-view #pTransferDept,
+  body.scoped-view #pFireReason,
+  body.scoped-view #pFireDate{
+    display:none !important;
+  }
+  body.scoped-view #profileForm input,
+  body.scoped-view #profileForm select{
+    pointer-events:none;
+    background:var(--paper-deep);
+    opacity:0.85;
+  }
+  #sessionBadge{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);
+    margin-top:6px;text-align:right;
+  }
+  #sessionBadge button{
+    background:none;border:none;color:var(--rust);cursor:pointer;font-size:12px;
+    text-decoration:underline;padding:0;margin-left:6px;
+  }
+  /* ---------- Страница входа ---------- */
+  #loginPage{
+    background:
+      radial-gradient(560px 420px at 12% -8%, rgba(15,122,75,0.16), transparent 60%),
+      radial-gradient(620px 480px at 108% 12%, rgba(201,162,39,0.14), transparent 55%),
+      linear-gradient(180deg, var(--paper) 0%, var(--paper-deep) 100%);
+    overflow:auto;
+  }
+  #loginPage::before{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    background-image:linear-gradient(rgba(11,94,58,0.05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(11,94,58,0.05) 1px, transparent 1px);
+    background-size:34px 34px;
+    -webkit-mask-image:radial-gradient(650px 480px at 50% 0%, #000 0%, transparent 75%);
+            mask-image:radial-gradient(650px 480px at 50% 0%, #000 0%, transparent 75%);
+  }
+  .login-wrap{
+    position:relative;max-width:400px;margin:8vh auto 40px;padding:0 20px;
+    animation:fadeInUp .55s cubic-bezier(.22,1,.36,1) both;
+  }
+  .login-brand{text-align:center;margin-bottom:26px;}
+  .login-brand .logo-badge{
+    width:78px;height:78px;border-radius:22px;background:#fff;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 16px;
+    box-shadow:0 14px 30px -14px rgba(11,94,58,0.4), 0 0 0 1px var(--line);
+    padding:14px;
+  }
+  .login-brand .logo-badge img{width:100%;height:100%;object-fit:contain;}
+  .login-brand h1{
+    font-family:'Fraunces',serif;font-weight:700;font-size:22px;margin:0 0 6px;color:var(--ink);
+  }
+  .login-brand .sub{margin:0;font-size:13px;letter-spacing:.02em;}
+  .login-card{
+    background:var(--card-bg);border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 24px 60px -24px rgba(11,94,58,0.28), 0 2px 10px rgba(27,42,34,0.06);
+    padding:30px 28px 26px;position:relative;overflow:hidden;
+  }
+  .login-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:4px;
+    background:linear-gradient(90deg,var(--green-deep),var(--green),var(--gold));
+  }
+  .login-field{margin-bottom:16px;}
+  .login-field:last-of-type{margin-bottom:0;}
+  .login-field label{
+    display:block;font-size:11.5px;font-weight:600;color:var(--ink-soft);
+    margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em;
+  }
+  .field-input-wrap{position:relative;}
+  .field-input-wrap .field-icon{
+    position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--ink-soft);
+    pointer-events:none;display:flex;align-items:center;transition:color .15s ease;
+  }
+  .login-field input{
+    width:100%;padding:12px 14px 12px 40px;border:1.5px solid var(--line);border-radius:10px;
+    background:var(--paper);font-family:'Inter',sans-serif;font-size:14.5px;color:var(--ink);
+    transition:border-color .15s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .login-field input:hover{border-color:#B9C6BC;}
+  .login-field input:focus{
+    outline:none;border-color:var(--green);background:#fff;
+    box-shadow:0 0 0 4px rgba(15,122,75,0.12);
+  }
+  .field-input-wrap:focus-within .field-icon{color:var(--green-deep);}
+  #loginBtn{
+    width:100%;margin-top:20px;padding:13px;border-radius:10px;
+    font-size:14px;letter-spacing:.02em;
+  }
+  .login-foot{text-align:center;margin-top:20px;font-size:11.5px;color:var(--ink-soft);letter-spacing:.03em;}
+  #loginStatus{margin-top:14px;}
+  @keyframes loginGlow{
+    0%, 100%{box-shadow:0 8px 18px -8px rgba(11,94,58,0.45), 0 0 0 0 rgba(15,122,75,0.35);}
+    50%{box-shadow:0 8px 18px -8px rgba(11,94,58,0.45), 0 0 0 8px rgba(15,122,75,0);}
+  }
+  #loginBtn{animation:loginGlow 2.2s ease-in-out infinite;}
+  #loginBtn:hover, #loginBtn:focus{animation-play-state:paused;}
 </style>
 </head>
 <body>
@@ -327,8 +524,44 @@
         <p class="eyebrow">AVESTO · Кадровый реестр сотрудников</p>
       </div>
     </div>
-    <div class="top-meta" id="topMeta">Записей: 0</div>
+    <div>
+      <div class="top-meta" id="topMeta">Записей: 0</div>
+      <div id="sessionBadge" style="display:none;"></div>
+    </div>
   </header>
+
+  <div id="loginPage" style="display:none;position:fixed;inset:0;z-index:3000;">
+    <div class="login-wrap">
+      <div class="login-brand">
+        <div class="logo-badge"><img src="" id="loginLogo" onerror="this.style.display='none'"></div>
+        <h1>Кадровый реестр Avesto</h1>
+        <p class="sub">Вход по корпоративному email и паролю</p>
+      </div>
+      <div class="login-card">
+        <div class="login-field">
+          <label>Email</label>
+          <div class="field-input-wrap">
+            <span class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+            </span>
+            <input type="email" id="loginEmail" placeholder="ivanov@company.tj" autocomplete="username">
+          </div>
+        </div>
+        <div class="login-field">
+          <label>Пароль</label>
+          <div class="field-input-wrap">
+            <span class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+          </div>
+        </div>
+        <button type="button" class="btn-primary" id="loginBtn">Войти</button>
+        <div class="status-msg" id="loginStatus"></div>
+      </div>
+      <p class="login-foot">AVESTO GROUP · КАДРОВЫЙ РЕЕСТР</p>
+    </div>
+  </div>
 
   <div id="backBar" style="display:none;margin-bottom:20px;">
     <button type="button" id="backToMainBtn" class="btn-primary" style="width:auto;margin-top:0;padding:9px 20px;">← Назад к дашборду</button>
@@ -356,7 +589,7 @@
     </div>
 
     <section class="panel">
-      <div class="card">
+      <div class="card" id="addEmployeeCard">
         <h2>Добавить сотрудника</h2>
         <p class="sub">Заполните карточку вручную</p>
         <form id="addForm">
@@ -386,6 +619,8 @@
           <input type="date" id="fHireDate">
           <label>Компания</label>
           <select id="fCompany"></select>
+          <label>Email *</label>
+          <input type="email" id="fEmail" placeholder="ivanov@company.tj" required>
           <label>Категория сотрудника</label>
           <select id="fCategory"></select>
           <label>Статус</label>
@@ -403,7 +638,7 @@
         </form>
       </div>
 
-      <div class="card c-gold">
+      <div class="card c-gold" id="excelUploadCard">
         <h2>Загрузить из Excel</h2>
         <p class="sub">Файл .xlsx / .xls / .csv</p>
         <label class="dropzone" for="fileInput">
@@ -417,7 +652,7 @@
         <p class="file-note">В отличие от обычной загрузки выше, этот способ даёт сайту право дозаписывать изменения прямо в выбранный файл — все новые/удалённые сотрудники будут сохраняться в него автоматически.</p>
       </div>
 
-      <div class="card c-slate">
+      <div class="card c-slate" id="folderSyncCard">
         <h2>Автозагрузка из папки</h2>
         <p class="sub">Работает только в Chrome / Edge на компьютере. Сайт держит в этой папке файл «реестр_сотрудников_база.xlsx» — свою резервную копию реестра, которая обновляется при каждом изменении и подхватывается заново при следующем запуске.</p>
         <button type="button" class="btn-primary" id="connectFolderBtn" style="margin-top:0;">Подключить папку</button>
@@ -629,6 +864,8 @@
         <input type="date" id="pHireDate">
         <label>Компания</label>
         <select id="pCompany"></select>
+        <label>Email</label>
+        <input type="email" id="pEmail" placeholder="ivanov@company.tj">
         <label>Категория сотрудника</label>
         <select id="pCategory"></select>
         <label>Статус</label>
@@ -998,10 +1235,12 @@ function computeMetrics(list){
 
 function renderMetricsInto(list, ids){
   const m = computeMetrics(list);
-  document.getElementById(ids.active).textContent = m.active.length;
-  document.getElementById(ids.hired).textContent = m.hiredThisMonth.length;
-  document.getElementById(ids.fired).textContent = m.firedThisMonth.length;
-  document.getElementById(ids.tenure).textContent = m.avgTenureMonths===null ? '—' : m.avgTenureMonths;
+  animateNumber(document.getElementById(ids.active), m.active.length);
+  animateNumber(document.getElementById(ids.hired), m.hiredThisMonth.length);
+  animateNumber(document.getElementById(ids.fired), m.firedThisMonth.length);
+  const tenureEl = document.getElementById(ids.tenure);
+  if(m.avgTenureMonths===null){ tenureEl.textContent = '—'; tenureEl.removeAttribute('data-num'); }
+  else { animateNumber(tenureEl, m.avgTenureMonths); }
 }
 
 function renderMetrics(){
@@ -1091,9 +1330,10 @@ function renderDeptChart(){
   deptColorMap = {};
   depts.forEach((d,i)=>{ deptColorMap[d] = PALETTE[i % PALETTE.length]; });
   const total = employees.length;
-  document.getElementById('deptTotalNum').textContent = total;
+  animateNumber(document.getElementById('deptTotalNum'), total);
   document.getElementById('deptEmptyNote').style.display = total===0 ? 'block' : 'none';
   document.getElementById('deptChart').style.background = buildDonut(counts, deptColorMap, total);
+  replayAnimation(document.getElementById('deptChart'));
   document.getElementById('deptLegend').innerHTML = depts.map(d=>`
     <li class="legend-row ${filters.dept===d?'active':''}" data-filter="dept" data-value="${escapeHtml(d)}">
       <span class="swatch" style="background:${deptColorMap[d]}"></span>
@@ -1107,9 +1347,10 @@ function renderGenderChart(){
   const counts = {'М':0,'Ж':0};
   employees.forEach(e=>{ counts[e.gender] = (counts[e.gender]||0)+1; });
   const total = employees.length;
-  document.getElementById('genderTotalNum').textContent = total;
+  animateNumber(document.getElementById('genderTotalNum'), total);
   document.getElementById('genderEmptyNote').style.display = total===0 ? 'block' : 'none';
   document.getElementById('genderChart').style.background = buildDonut(counts, GENDER_COLOR, total);
+  replayAnimation(document.getElementById('genderChart'));
   const names = {'М':'Мужчины','Ж':'Женщины'};
   document.getElementById('genderLegend').innerHTML = Object.keys(counts).map(g=>`
     <li class="legend-row ${filters.gender===g?'active':''}" data-filter="gender" data-value="${g}">
@@ -1130,9 +1371,49 @@ function renderCategoryBars(){
     const pct = total ? Math.round(counts[c]/total*100) : 0;
     return `<div class="bar-row ${filters.category===c?'active':''}" data-filter="category" data-value="${escapeHtml(c)}">
       <div class="bar-row-top"><span>${escapeHtml(c)}</span><span class="mono">${counts[c]} · ${pct}%</span></div>
-      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${CATEGORY_COLOR[c]}"></div></div>
+      <div class="bar-track"><div class="bar-fill" data-pct="${pct}" style="width:0%;background:${CATEGORY_COLOR[c]}"></div></div>
     </div>`;
   }).join('');
+  animateBarFills(document.getElementById('categoryBars'));
+}
+
+// Плавно "выращивает" полосы диаграмм от 0 до целевого значения (data-pct)
+function animateBarFills(container){
+  if(!container) return;
+  const fills = container.querySelectorAll('.bar-fill[data-pct]');
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      fills.forEach(el=>{ el.style.width = el.getAttribute('data-pct') + '%'; });
+    });
+  });
+}
+
+// Перезапускает CSS-анимацию элемента (например, donutPop) при обновлении данных
+function replayAnimation(el){
+  if(!el) return;
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = '';
+}
+
+// Плавный счётчик чисел в карточках метрик и итогов диаграмм
+function animateNumber(el, target){
+  if(!el) return;
+  target = Number(target) || 0;
+  const start = Number(el.getAttribute('data-num')) || 0;
+  if(start === target){ el.textContent = target; el.setAttribute('data-num', target); return; }
+  el.setAttribute('data-num', target);
+  const duration = 500;
+  const t0 = performance.now();
+  function tick(now){
+    const p = Math.min(1, (now - t0) / duration);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const val = Math.round(start + (target - start) * eased);
+    el.textContent = val;
+    if(p < 1) requestAnimationFrame(tick);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(tick);
 }
 
 function renderReasonChart(){
@@ -1142,9 +1423,10 @@ function renderReasonChart(){
   const reasons = Object.keys(counts);
   const colorMap = {}; reasons.forEach((r,i)=>{ colorMap[r] = PALETTE[i % PALETTE.length]; });
   const total = fired.length;
-  document.getElementById('reasonTotalNum').textContent = total;
+  animateNumber(document.getElementById('reasonTotalNum'), total);
   document.getElementById('reasonEmptyNote').style.display = total===0 ? 'block' : 'none';
   document.getElementById('reasonChart').style.background = buildDonut(counts, colorMap, total);
+  replayAnimation(document.getElementById('reasonChart'));
   document.getElementById('reasonChart').setAttribute('data-nav', 'terminations');
   document.getElementById('reasonChart').style.cursor = 'pointer';
   document.getElementById('reasonLegend').innerHTML = reasons.map(r=>`
@@ -1160,7 +1442,8 @@ function renderAgeSection(){
   const withAge = employees.filter(e=>e.age !== null && !isNaN(e.age));
   document.getElementById('ageEmptyNote').style.display = withAge.length===0 ? 'block' : 'none';
   const avg = withAge.length ? Math.round(withAge.reduce((s,e)=>s+e.age,0)/withAge.length) : null;
-  document.getElementById('avgAgeNum').textContent = avg===null ? '—' : avg;
+  if(avg===null){ document.getElementById('avgAgeNum').textContent = '—'; document.getElementById('avgAgeNum').removeAttribute('data-num'); }
+  else { animateNumber(document.getElementById('avgAgeNum'), avg); }
 
   document.getElementById('ageBars').innerHTML = AGE_BUCKETS.map((b,i)=>{
     const count = withAge.filter(e=>e.age>=b.min && e.age<=b.max).length;
@@ -1168,9 +1451,10 @@ function renderAgeSection(){
     const active = filters.ageMin===b.min && filters.ageMax===b.max;
     return `<div class="bar-row ${active?'active':''}" data-filter="age" data-min="${b.min}" data-max="${b.max}" data-label="${b.label}">
       <div class="bar-row-top"><span>${b.label} лет</span><span class="mono">${count} · ${pct}%</span></div>
-      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${PALETTE[i % PALETTE.length]}"></div></div>
+      <div class="bar-track"><div class="bar-fill" data-pct="${pct}" style="width:0%;background:${PALETTE[i % PALETTE.length]}"></div></div>
     </div>`;
   }).join('');
+  animateBarFills(document.getElementById('ageBars'));
 
   document.getElementById('ageQuick').innerHTML = AGE_QUICK.map(q=>{
     const active = filters.ageMin===q.min && filters.ageMax===q.max;
@@ -1383,7 +1667,8 @@ document.getElementById('addForm').addEventListener('submit', async (ev)=>{
   const status = document.getElementById('fStatus').value;
   const hireDate = document.getElementById('fHireDate').value;
   const company = document.getElementById('fCompany').value;
-  if(!last || !first || !dept) return;
+  const email = document.getElementById('fEmail').value.trim();
+  if(!last || !first || !dept || !email) return;
   const history = [{
     date: hireDate || new Date().toISOString().slice(0,10),
     type: 'hire',
@@ -1401,7 +1686,7 @@ document.getElementById('addForm').addEventListener('submit', async (ev)=>{
     id: genId(), last, first, middle, dept,
     age: ageVal ? Number(ageVal) : null,
     gender: document.getElementById('fGender').value,
-    hireDate, company,
+    hireDate, company, email,
     category: document.getElementById('fCategory').value,
     status,
     reason: status==='Уволен' ? document.getElementById('fReason').value : '',
@@ -2381,6 +2666,7 @@ function renderProfileView(id){
 
   fillSelectOnce(document.getElementById('pCompany'), COMPANIES, 'id', 'name');
   document.getElementById('pCompany').value = e.company;
+  document.getElementById('pEmail').value = e.email || '';
   fillSelectOnce(document.getElementById('pCategory'), CATEGORIES);
   document.getElementById('pCategory').value = e.category;
   fillSelectOnce(document.getElementById('pReason'), REASONS);
@@ -2436,6 +2722,7 @@ document.getElementById('profileForm').addEventListener('submit', async (ev)=>{
   e.dept = newDept;
   e.hireDate = document.getElementById('pHireDate').value;
   e.company = newCompany;
+  e.email = document.getElementById('pEmail').value.trim();
   e.category = document.getElementById('pCategory').value;
   e.status = status;
   e.reason = status==='Уволен' ? document.getElementById('pReason').value : '';
@@ -2589,7 +2876,7 @@ document.getElementById('bulkExportBtn').addEventListener('click', ()=>{
 
 // ---------- Синхронизация с Google Таблицей (через Apps Script Web App) ----------
 // Ссылка не секретна сама по себе (без секретного слова она бесполезна), поэтому её можно хранить прямо в коде.
-const DEFAULT_SHEET_SYNC_URL = 'https://script.google.com/macros/s/AKfycbwqSyWHxfA7Cm2hY07mldOQfP_KrsvAM1aGMlJy141bZGmALmbjYUPSDGpZAVtYbAn1lA/exec';
+const DEFAULT_SHEET_SYNC_URL = 'https://script.google.com/macros/s/AKfycbwo8_uAZmClcotb46vxprp4gCh4JmpYTSN0SO5lko8HF-EDKgNUAUZ9slfhTSXptkOpzA/exec';
 let sheetSyncUrl = DEFAULT_SHEET_SYNC_URL;
 let sheetSyncSecret = '';
 let sheetSyncTimer = null;
@@ -2639,7 +2926,8 @@ function employeeToSheetRow(e){
     'Категория': e.category,
     'Компания': COMPANY_BY_ID[e.company] ? COMPANY_BY_ID[e.company].name : e.company,
     'Статус': e.status, 'Причина увольнения': e.reason,
-    'Дата увольнения': e.termDate, 'Дата приёма': e.hireDate
+    'Дата увольнения': e.termDate, 'Дата приёма': e.hireDate,
+    'Email': e.email || ''
   };
 }
 
@@ -2658,6 +2946,7 @@ function sheetRowToEmployee(row, oldById){
     reason: String(row['Причина увольнения']||''),
     termDate: String(row['Дата увольнения']||''),
     hireDate: String(row['Дата приёма']||''),
+    email: String(row['Email']||''),
     history: old ? (old.history||[]) : []
   };
 }
@@ -2770,12 +3059,163 @@ document.getElementById('sheetSyncDisconnectBtn').addEventListener('click', asyn
   document.getElementById('sheetSyncStatus').className = 'status-msg';
 });
 
+// ---------- Вход по email + паролю (лист «Доступы» в Google Таблице) ----------
+// Секрет ниже должен совпадать с SECRET в Apps Script (см. apps_script_code.gs).
+// Сайт публичный (GitHub Pages), поэтому это не «военная» защита данных —
+// это лишь фильтр от случайных обращений к служебному URL. Реальный контроль
+// доступа (кто и что видит) обеспечивает отдельный лист «Доступы», которым
+// управляет только администратор: там задаются email, пароль, компания и
+// признак HQ. Пароли на сервере хранятся в виде хэша (см. Apps Script).
+const LOGIN_ACCESS_SECRET = 'avesto-2026-secret';
+let session = null; // {email, company, companyId, isHQ}
+
+function findCompanyIdByName(name){
+  const c = COMPANIES.find(c=>c.name===name);
+  return c ? c.id : '';
+}
+
+function showLoginOverlay(prefillEmail){
+  const brandImg = document.querySelector('.brand-logo');
+  const loginLogo = document.getElementById('loginLogo');
+  if(brandImg && loginLogo && !loginLogo.src){ loginLogo.src = brandImg.src; }
+  document.getElementById('loginPage').style.display = 'block';
+  if(prefillEmail) document.getElementById('loginEmail').value = prefillEmail;
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginPassword').focus();
+}
+function hideLoginOverlay(){
+  document.getElementById('loginPage').style.display = 'none';
+}
+
+function updateSessionBadge(){
+  const badge = document.getElementById('sessionBadge');
+  if(!session){ badge.style.display = 'none'; return; }
+  const roleLabel = session.isHQ
+    ? 'Головной офис · полный доступ'
+    : (COMPANY_BY_ID[session.companyId] ? COMPANY_BY_ID[session.companyId].name : (session.company || '—'));
+  badge.style.display = 'block';
+  badge.innerHTML = `${escapeHtml(session.email)} · ${escapeHtml(roleLabel)} <button type="button" id="logoutBtn">Выйти</button>`;
+  document.getElementById('logoutBtn').addEventListener('click', logout);
+}
+
+async function logout(){
+  session = null;
+  try{ await kvSet('loginSessionEmail', ''); }catch(e){}
+  try{ await kvSet('loginSessionPassword', ''); }catch(e){}
+  location.reload();
+}
+
+async function doLogin(email, password, opts){
+  opts = opts || {};
+  const statusEl = document.getElementById('loginStatus');
+  statusEl.className = 'status-msg ok';
+  statusEl.textContent = 'Проверяю доступ...';
+  try{
+    const data = await jsonpRequest(
+      `${DEFAULT_SHEET_SYNC_URL}?secret=${encodeURIComponent(LOGIN_ACCESS_SECRET)}` +
+      `&action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
+      20000
+    );
+    if(data.error === 'not_found'){
+      statusEl.className = 'status-msg err';
+      statusEl.textContent = 'Этот email не найден среди выданных доступов. Обратитесь к администратору.';
+      return false;
+    }
+    if(data.error === 'disabled'){
+      statusEl.className = 'status-msg err';
+      statusEl.textContent = 'Доступ для этого email отключён администратором.';
+      return false;
+    }
+    if(data.error === 'wrong_password'){
+      statusEl.className = 'status-msg err';
+      statusEl.textContent = 'Неверный пароль.';
+      return false;
+    }
+    if(data.error){
+      statusEl.className = 'status-msg err';
+      statusEl.textContent = 'Не удалось выполнить вход. Попробуйте позже.';
+      return false;
+    }
+
+    session = {
+      email,
+      company: data.company || '',
+      companyId: findCompanyIdByName(data.company || ''),
+      isHQ: !!data.isHQ
+    };
+    try{
+      await kvSet('loginSessionEmail', email);
+      await kvSet('loginSessionPassword', password);
+    }catch(e){}
+
+    const oldById = {};
+    employees.forEach(e=>{ oldById[e.id] = e; });
+    employees = (data.employees || []).map(row=> sheetRowToEmployee(row, oldById));
+    try{ await kvSet(STORAGE_KEY, JSON.stringify(employees)); }catch(e){}
+
+    document.body.classList.toggle('scoped-view', !session.isHQ);
+
+    if(session.isHQ){
+      // HQ входит по email/паролю и сразу получает полный режим синхронизации/редактирования
+      sheetSyncUrl = DEFAULT_SHEET_SYNC_URL;
+      sheetSyncSecret = LOGIN_ACCESS_SECRET;
+      try{ await kvSet('sheetSyncSecret', LOGIN_ACCESS_SECRET); }catch(e){}
+      updateSheetSyncUI();
+      startSheetSyncPolling();
+    }
+
+    updateSessionBadge();
+    renderAll();
+    hideLoginOverlay();
+    return true;
+  }catch(err){
+    statusEl.className = 'status-msg err';
+    if(!opts.silent){
+      statusEl.textContent = 'Не удалось связаться с сервером: ' + err.message;
+    }
+    return false;
+  }
+}
+
+document.getElementById('loginBtn').addEventListener('click', ()=>{
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const statusEl = document.getElementById('loginStatus');
+  if(!email || !password){
+    statusEl.className = 'status-msg err';
+    statusEl.textContent = 'Введите email и пароль.';
+    return;
+  }
+  doLogin(email, password);
+});
+document.getElementById('loginEmail').addEventListener('keydown', (ev)=>{
+  if(ev.key === 'Enter') document.getElementById('loginPassword').focus();
+});
+document.getElementById('loginPassword').addEventListener('keydown', (ev)=>{
+  if(ev.key === 'Enter') document.getElementById('loginBtn').click();
+});
+
+async function initLoginGate(){
+  let cachedEmail = '', cachedPassword = '';
+  try{ cachedEmail = (await kvGet('loginSessionEmail')) || ''; }catch(e){ cachedEmail = ''; }
+  try{ cachedPassword = (await kvGet('loginSessionPassword')) || ''; }catch(e){ cachedPassword = ''; }
+  showLoginOverlay(cachedEmail);
+  if(cachedEmail && cachedPassword){
+    const ok = await doLogin(cachedEmail, cachedPassword, {silent:true});
+    if(!ok){
+      document.getElementById('loginStatus').textContent = '';
+      document.getElementById('loginStatus').className = 'status-msg';
+    }
+  }
+}
+
 (async function init(){
   await loadData();
   renderAll();
   await initFolderSync();
   await initSourceFileSync();
   await loadSheetSyncConfig();
+  await initLoginGate();
 })();
 </script>
 </body>
